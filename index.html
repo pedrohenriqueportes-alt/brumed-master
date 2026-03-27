@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRUMED MASTER — Automação NR-01</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg:       #0f1117;
+    --panel:    #161b27;
+    --card:     #1c2333;
+    --border:   #252f45;
+    --input:    #1a2035;
+    --accent:   #2563eb;
+    --accent-h: #3b82f6;
+    --success:  #16a34a;
+    --success-h:#22c55e;
+    --warning:  #d97706;
+    --danger:   #dc2626;
+    --purple:   #7c3aed;
+    --text:     #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-lbl: #cbd5e1;
+    --sep:      #1e2d45;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: #0a0e18;
+    border-bottom: 1px solid var(--sep);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-accent { height: 3px; background: var(--accent); }
+  .header-inner {
+    max-width: 960px; margin: 0 auto;
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-name { font-size: 20px; font-weight: 700; color: #f8fafc; }
+  .badge {
+    background: var(--accent); color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 4px;
+  }
+  .logo-sub { font-size: 12px; color: var(--text-dim); margin-left: 8px; }
+  .header-company { font-size: 12px; color: var(--text-dim); }
+
+  /* ── Steps ── */
+  .steps {
+    max-width: 960px; margin: 28px auto 0;
+    padding: 0 24px;
+    display: flex; gap: 0; align-items: center;
+  }
+  .step {
+    display: flex; align-items: center; gap: 8px;
+    flex: 1; cursor: pointer;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--sep);
+    transition: all .2s;
+  }
+  .step.active { border-bottom-color: var(--accent); }
+  .step.done   { border-bottom-color: var(--success); }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--border); color: var(--text-dim);
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step.active .step-num { background: var(--accent); color: #fff; }
+  .step.done   .step-num { background: var(--success); color: #fff; }
+  .step-label { font-size: 12px; font-weight: 500; color: var(--text-dim); }
+  .step.active .step-label { color: var(--text); }
+  .step.done   .step-label { color: var(--success-h); }
+  .step-sep { width: 24px; height: 1px; background: var(--sep); flex-shrink: 0; }
+
+  /* ── Main ── */
+  main {
+    max-width: 960px; margin: 24px auto 60px;
+    padding: 0 24px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--sep);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-icon { font-size: 16px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .card-body { padding: 20px; }
+
+  /* ── Upload ── */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(37,99,235,.06);
+  }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+  .upload-icon { font-size: 36px; margin-bottom: 10px; }
+  .upload-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .upload-sub { font-size: 12px; color: var(--text-dim); }
+  .upload-ok {
+    display: none;
+    background: rgba(22,163,74,.1);
+    border: 1px solid var(--success);
+    border-radius: 8px;
+    padding: 16px 20px;
+    align-items: center; gap: 12px;
+  }
+  .upload-ok.show { display: flex; }
+  .upload-ok-icon { font-size: 24px; }
+  .upload-ok-name { font-weight: 600; font-size: 14px; color: var(--success-h); }
+  .upload-ok-sub { font-size: 12px; color: var(--text-dim); }
+  .upload-change { font-size: 11px; color: var(--accent-h); cursor: pointer; margin-top: 2px; text-decoration: underline; }
+
+  /* ── Form ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-grid.full { grid-template-columns: 1fr; }
+  @media(max-width:600px){ .form-grid { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 12px; font-weight: 500; color: var(--text-lbl); }
+  .field input, .field select {
+    background: var(--input);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color .15s;
+    width: 100%;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .field input[type="date"] { color-scheme: dark; }
+  .field input.error { border-color: var(--danger); }
+  .field .hint { font-size: 11px; color: var(--text-dim); }
+  .field .err-msg { font-size: 11px; color: #ef4444; display: none; }
+  .field.has-error .err-msg { display: block; }
+  .field.has-error input { border-color: var(--danger); }
+
+  /* ── Severidade slider ── */
+  .sev-btns { display: flex; gap: 8px; }
+  .sev-btn {
+    flex: 1; padding: 10px 4px;
+    border-radius: 6px; border: 1px solid var(--border);
+    background: var(--input); color: var(--text-dim);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; text-align: center;
+    transition: all .15s;
+  }
+  .sev-btn:hover { border-color: var(--accent); color: var(--text); }
+  .sev-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .sev-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+  .sev-label { font-size: 10px; color: var(--text-dim); }
+
+  /* ── Opções geração ── */
+  .gen-opts { display: flex; gap: 12px; flex-wrap: wrap; }
+  .gen-opt {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--input); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; transition: all .15s; flex: 1; min-width: 140px;
+  }
+  .gen-opt:hover { border-color: var(--accent); }
+  .gen-opt input { display: none; }
+  .gen-opt.checked { border-color: var(--accent); background: rgba(37,99,235,.08); }
+  .gen-opt-icon { font-size: 18px; }
+  .gen-opt-label { font-size: 12px; font-weight: 500; }
+  .gen-opt-sub { font-size: 10px; color: var(--text-dim); }
+
+  /* ── Botões ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 22px; border-radius: 7px; border: none;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .15s; text-decoration: none;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-h); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-success:hover { background: var(--success-h); }
+  .btn-secondary { background: var(--border); color: var(--text); }
+  .btn-secondary:hover { background: var(--sep); }
+  .btn-lg { padding: 14px 32px; font-size: 15px; width: 100%; justify-content: center; }
+
+  /* ── Preview ── */
+  .preview-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .preview-stat {
+    background: var(--input); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px;
+    text-align: center; flex: 1;
+  }
+  .preview-stat-val { font-size: 24px; font-weight: 700; color: var(--accent-h); }
+  .preview-stat-lbl { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .preview-stats { display: flex; gap: 12px; margin-bottom: 20px; }
+
+  .setor-card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; margin-bottom: 12px;
+  }
+  .setor-name { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .setor-respondentes { font-size: 11px; color: var(--text-dim); margin-bottom: 12px; }
+  .setor-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  @media(max-width:600px){ .setor-grid { grid-template-columns: 1fr 1fr; } }
+  .q-box {
+    border-radius: 6px; padding: 10px 8px; text-align: center;
+    border: 1px solid var(--border); background: var(--input);
+  }
+  .q-label { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+  .q-media { font-size: 18px; font-weight: 700; margin: 4px 0; }
+  .q-cond { font-size: 9px; font-weight: 600; }
+
+  /* ── Loading ── */
+  .loading {
+    display: none;
+    flex-direction: column; align-items: center;
+    gap: 16px; padding: 40px;
+    text-align: center;
+  }
+  .loading.show { display: flex; }
+  .spinner {
+    width: 44px; height: 44px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-msg { font-size: 14px; color: var(--text-dim); }
+
+  /* ── Success ── */
+  .success-box {
+    display: none;
+    flex-direction: column; align-items: center;
+    gap: 16px; padding: 40px; text-align: center;
+  }
+  .success-box.show { display: flex; }
+  .success-icon { font-size: 56px; }
+  .success-title { font-size: 20px; font-weight: 700; }
+  .success-sub { font-size: 13px; color: var(--text-dim); max-width: 400px; }
+
+  /* ── Sections ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── Progress bar ── */
+  .progress-bar {
+    height: 3px; background: var(--sep);
+    border-radius: 2px; overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    border-radius: 2px; transition: width .4s ease;
+  }
+
+  /* ── Footer ── */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--panel);
+    border-top: 1px solid var(--sep);
+    padding: 12px 24px;
+    display: flex; justify-content: center; gap: 12px;
+    z-index: 50;
+  }
+
+  /* ── Tooltip ── */
+  .tooltip { position: relative; }
+  .tooltip-text {
+    position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+    background: #1e293b; color: var(--text); font-size: 11px;
+    padding: 6px 10px; border-radius: 5px; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity .15s;
+    border: 1px solid var(--border);
+  }
+  .tooltip:hover .tooltip-text { opacity: 1; }
+
+  .text-dim { color: var(--text-dim); font-size: 12px; }
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .flex { display: flex; }
+  .gap-8 { gap: 8px; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+
+  /* ── Severidade por setor no Passo 2 ── */
+  .sev-setor-lista { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .sev-setor-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--input); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 14px; gap: 12px; flex-wrap: wrap;
+  }
+  .sev-setor-nome { font-size: 13px; font-weight: 500; flex: 1; min-width: 120px; }
+  .sev-setor-btns { display: flex; gap: 5px; }
+  .sev-setor-btn {
+    width: 32px; height: 32px; border-radius: 5px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text-dim); font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s;
+  }
+  .sev-setor-btn:hover { border-color: var(--accent); color: var(--text); }
+  .sev-setor-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .sev-loading-mini { font-size: 12px; color: var(--text-dim); padding: 8px 0; display: flex; align-items: center; gap: 8px; }
+
+  /* ── Severidade por setor ── */
+  .setor-sev {
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid var(--sep);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .setor-sev-label { font-size: 11px; color: var(--text-dim); white-space: nowrap; }
+  .setor-sev-btns { display: flex; gap: 5px; }
+  .setor-sev-btn {
+    width: 28px; height: 28px; border-radius: 5px;
+    background: var(--input); border: 1px solid var(--border);
+    color: var(--text-dim); font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s;
+  }
+  .setor-sev-btn:hover { border-color: var(--accent); color: var(--text); }
+  .setor-sev-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .setor-sev-hint { font-size: 10px; color: var(--text-dim); }
+
+  /* ── Mural (step 5) ── */
+  .mural-block { margin-bottom: 28px; }
+  .mural-block h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; border-bottom: 1px solid var(--sep); padding-bottom: 8px; }
+  .mural-block p { font-size: 13px; color: var(--text-dim); line-height: 1.7; margin-bottom: 8px; }
+  .mural-block ul { padding-left: 18px; }
+  .mural-block ul li { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+  .risk-matrix { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
+  .risk-matrix th, .risk-matrix td { border: 1px solid var(--border); padding: 7px 10px; text-align: center; }
+  .risk-matrix thead th { background: var(--input); color: var(--text-lbl); font-weight: 600; }
+  .risk-matrix tbody tr td:first-child { background: var(--input); color: var(--text-lbl); font-weight: 600; white-space: nowrap; }
+  .rc-irr  { background: #374151; color: #9ca3af; font-weight: 700; }
+  .rc-pr4  { background: #14532d; color: #86efac; font-weight: 700; }
+  .rc-pr3  { background: #713f12; color: #fde68a; font-weight: 700; }
+  .rc-pr2  { background: #7c2d12; color: #fed7aa; font-weight: 700; }
+  .rc-pr1  { background: #7f1d1d; color: #fca5a5; font-weight: 700; }
+  .fonte-box {
+    background: var(--input); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 16px;
+    font-size: 11px; color: var(--text-dim); line-height: 1.6;
+  }
+  .fonte-box strong { color: var(--text-lbl); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-accent"></div>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-name">BRUMED MASTER</span>
+      <span class="badge">v1.0</span>
+      <span class="logo-sub">Automação de Análise de Riscos Psicossociais · NR-01</span>
+    </div>
+    <span class="header-company">Portrex Operações e Soluções Integradas</span>
+  </div>
+</header>
+
+<div class="steps">
+  <div class="step active" id="step1" onclick="goStep(1)">
+    <div class="step-num">1</div>
+    <div class="step-label">Planilha</div>
+  </div>
+  <div class="step-sep"></div>
+  <div class="step" id="step2" onclick="goStep(2)">
+    <div class="step-num">2</div>
+    <div class="step-label">Dados</div>
+  </div>
+  <div class="step-sep"></div>
+  <div class="step" id="step3" onclick="goStep(3)">
+    <div class="step-num">3</div>
+    <div class="step-label">Preview</div>
+  </div>
+  <div class="step-sep"></div>
+  <div class="step" id="step4" onclick="goStep(4)">
+    <div class="step-num">4</div>
+    <div class="step-label">Gerar</div>
+  </div>
+  <div class="step-sep"></div>
+  <div class="step" id="step5" onclick="goStep(5)" style="cursor:pointer;">
+    <div class="step-num">5</div>
+    <div class="step-label">Sobre</div>
+  </div>
+</div>
+
+<main>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:25%"></div>
+  </div>
+
+  <!-- ══ ETAPA 1 — PLANILHA ══ -->
+  <div class="section active" id="sec1">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">📁</span>
+        <span class="card-title">Arquivo de Respostas</span>
+      </div>
+      <div class="card-body">
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept=".xlsx">
+          <div class="upload-icon">📊</div>
+          <div class="upload-title">Clique ou arraste a planilha aqui</div>
+          <div class="upload-sub">Formato aceito: .xlsx — aba "Questionário" com respostas</div>
+        </div>
+        <div class="upload-ok" id="uploadOk">
+          <span class="upload-ok-icon">✅</span>
+          <div>
+            <div class="upload-ok-name" id="uploadOkName"></div>
+            <div class="upload-ok-sub" id="uploadOkSub"></div>
+            <div class="upload-change" onclick="resetFile()">Trocar arquivo</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ETAPA 2 — DADOS INSTITUCIONAIS ══ -->
+  <div class="section" id="sec2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">🏢</span>
+        <span class="card-title">Dados Institucionais</span>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="field" id="f_razao">
+            <label>Razão Social *</label>
+            <input type="text" id="razao_social" placeholder="Nome da empresa" oninput="clearErr('f_razao')">
+            <span class="err-msg">Campo obrigatório</span>
+          </div>
+          <div class="field" id="f_cnpj">
+            <label>CNPJ *</label>
+            <input type="text" id="cnpj" placeholder="00.000.000/0001-00" oninput="maskCNPJ(this); clearErr('f_cnpj')">
+            <span class="err-msg">CNPJ inválido</span>
+          </div>
+          <div class="field" id="f_prof">
+            <label>Profissional Responsável *</label>
+            <input type="text" id="profissional_responsavel" placeholder="Nome completo" oninput="clearErr('f_prof')">
+            <span class="err-msg">Campo obrigatório</span>
+          </div>
+          <div class="field" id="f_ocup">
+            <label>Ocupação / Cargo *</label>
+            <input type="text" id="ocupacao" placeholder="Ex: Engenheiro SST" oninput="clearErr('f_ocup')">
+            <span class="err-msg">Campo obrigatório</span>
+          </div>
+          <div class="field" id="f_reg">
+            <label>Registro Profissional *</label>
+            <input type="text" id="registro_profissional" placeholder="Ex: CREA 12345" oninput="clearErr('f_reg')">
+            <span class="err-msg">Campo obrigatório</span>
+          </div>
+          <div class="field" id="f_data">
+            <label>Data do Relatório *</label>
+            <input type="date" id="data_relatorio" oninput="clearErr('f_data')">
+            <span class="err-msg">Data inválida</span>
+          </div>
+        </div>
+
+        <div class="mt-16">
+          <div class="field">
+            <label>Severidade Geral (1 a 5) *</label>
+            <div class="sev-btns" id="sevBtns2">
+              <div class="sev-btn" onclick="setSev(1,'sevBtns2')">1</div>
+              <div class="sev-btn" onclick="setSev(2,'sevBtns2')">2</div>
+              <div class="sev-btn active" onclick="setSev(3,'sevBtns2')">3</div>
+              <div class="sev-btn" onclick="setSev(4,'sevBtns2')">4</div>
+              <div class="sev-btn" onclick="setSev(5,'sevBtns2')">5</div>
+            </div>
+            <div class="sev-labels">
+              <span class="sev-label">Sem incapacidade</span>
+              <span class="sev-label">Parcial temporária</span>
+              <span class="sev-label">Parcial permanente</span>
+              <span class="sev-label">Total temporária</span>
+              <span class="sev-label">Total permanente</span>
+            </div>
+            <span class="hint">Usado como padrão. Você pode ajustar por setor abaixo.</span>
+          </div>
+        </div>
+
+        <div class="mt-16" id="sevSetoresBox">
+          <div class="field">
+            <label>Severidade por Setor</label>
+            <div class="sev-loading-mini" id="sevSetoresLoading">
+              <div class="spinner" style="width:16px;height:16px;border-width:2px;"></div>
+              Identificando setores da planilha...
+            </div>
+            <div class="sev-setor-lista" id="sevSetoresLista" style="display:none;"></div>
+          </div>
+        </div>
+
+        <div class="mt-16">
+          <label style="font-size:12px;font-weight:500;color:var(--text-lbl);display:block;margin-bottom:10px;">
+            Relatórios a gerar
+          </label>
+          <div class="gen-opts">
+            <label class="gen-opt checked" id="opt_principal">
+              <input type="checkbox" checked onchange="toggleOpt('opt_principal')">
+              <span class="gen-opt-icon">📄</span>
+              <div>
+                <div class="gen-opt-label">Relatório Principal</div>
+                <div class="gen-opt-sub">Cap. 6 + Cap. 7</div>
+              </div>
+            </label>
+            <label class="gen-opt checked" id="opt_top5">
+              <input type="checkbox" checked onchange="toggleOpt('opt_top5')">
+              <span class="gen-opt-icon">📊</span>
+              <div>
+                <div class="gen-opt-label">Top 5 Fatores</div>
+                <div class="gen-opt-sub">Por setor e questionário</div>
+              </div>
+            </label>
+            <label class="gen-opt checked" id="opt_cons">
+              <input type="checkbox" checked onchange="toggleOpt('opt_cons')">
+              <span class="gen-opt-icon">🔍</span>
+              <div>
+                <div class="gen-opt-label">Consistência</div>
+                <div class="gen-opt-sub">Análise de inconsistências</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ETAPA 3 — PREVIEW ══ -->
+  <div class="section" id="sec3">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">👁</span>
+        <span class="card-title">Preview dos Resultados</span>
+      </div>
+      <div class="card-body">
+        <div class="loading show" id="loadingPreview">
+          <div class="spinner"></div>
+          <div class="loading-msg">Processando planilha...</div>
+        </div>
+        <div id="previewContent" style="display:none">
+          <div class="preview-stats" id="previewStats"></div>
+          <div id="previewSetores"></div>
+        </div>
+        <div id="previewError" style="display:none;color:#ef4444;padding:20px;text-align:center;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ETAPA 4 — GERAR ══ -->
+  <div class="section" id="sec4">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">⚡</span>
+        <span class="card-title">Gerar Relatórios</span>
+      </div>
+      <div class="card-body">
+        <div class="loading" id="loadingGerar">
+          <div class="spinner"></div>
+          <div class="loading-msg" id="loadingGerarMsg">Gerando relatórios...</div>
+        </div>
+        <div class="success-box" id="successBox">
+          <div class="success-icon">🎉</div>
+          <div class="success-title">Relatórios prontos!</div>
+          <div class="success-sub">Seu arquivo ZIP com todos os relatórios foi gerado. Clique abaixo para baixar.</div>
+          <a href="#" id="downloadLink" class="btn btn-success btn-lg" style="max-width:320px;">
+            ⬇ Baixar Relatórios (.zip)
+          </a>
+          <button class="btn btn-secondary" onclick="novoRelatorio()">+ Novo Relatório</button>
+        </div>
+        <div id="gerarReady" style="text-align:center;padding:30px;">
+          <div style="font-size:48px;margin-bottom:16px;">📋</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:8px;">Tudo pronto para gerar</div>
+          <div style="font-size:13px;color:var(--text-dim);margin-bottom:24px;">
+            Clique no botão abaixo para processar a planilha e baixar todos os relatórios em um arquivo ZIP.
+          </div>
+          <button class="btn btn-primary btn-lg" style="max-width:360px;" onclick="gerarRelatorios()">
+            ⚡ Gerar Todos os Relatórios
+          </button>
+        </div>
+        <div id="gerarError" style="display:none;color:#ef4444;padding:20px;text-align:center;font-size:13px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ETAPA 5 — SOBRE / MURAL ══ -->
+  <div class="section" id="sec5">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">📋</span>
+        <span class="card-title">Sobre a Análise de Riscos Psicossociais</span>
+      </div>
+      <div class="card-body">
+
+        <div class="mural-block">
+          <h3>Por que realizar a Análise de Riscos Psicossociais?</h3>
+          <p>Os riscos psicossociais no trabalho estão associados à organização do trabalho, às relações interpessoais, ao conteúdo das tarefas e ao ambiente laboral. Quando não gerenciados, podem gerar adoecimento físico e mental, absenteísmo, rotatividade e queda na produtividade.</p>
+          <p>A avaliação sistemática desses fatores permite às organizações identificar, priorizar e controlar exposições que comprometem a saúde e a segurança dos trabalhadores, em conformidade com a legislação vigente.</p>
+        </div>
+
+        <div class="mural-block">
+          <h3>Obrigatoriedade Legal — NR-01 (Portaria MTE nº 1.419/2024)</h3>
+          <p>A <strong style="color:var(--text-lbl)">Norma Regulamentadora nº 1</strong>, atualizada pela Portaria MTE nº 1.419, de 27 de setembro de 2024, tornou obrigatório o Gerenciamento de Riscos Ocupacionais (GRO), incluindo expressamente os <strong style="color:var(--text-lbl)">fatores de risco psicossocial</strong> no escopo do Programa de Gerenciamento de Riscos (PGR).</p>
+          <ul>
+            <li><strong style="color:var(--text-lbl)">Item 1.5.1</strong> — Obriga os empregadores a identificar, avaliar e controlar os riscos ocupacionais, incluindo os psicossociais relacionados ao trabalho.</li>
+            <li><strong style="color:var(--text-lbl)">Item 1.5.3</strong> — Determina que o PGR contemple medidas de prevenção para os riscos identificados, com hierarquia de controles.</li>
+            <li><strong style="color:var(--text-lbl)">Vigência</strong> — As disposições relativas a riscos psicossociais passam a ser exigidas progressivamente a partir de 26 de maio de 2025.</li>
+          </ul>
+        </div>
+
+        <div class="mural-block">
+          <h3>Matriz de Classificação BRUMED</h3>
+          <p style="margin-bottom:12px;">A classificação do risco é determinada pela combinação entre a <strong style="color:var(--text-lbl)">Probabilidade Assumida</strong> (derivada da média das respostas) e a <strong style="color:var(--text-lbl)">Severidade</strong> definida pelo profissional responsável.</p>
+          <table class="risk-matrix">
+            <thead>
+              <tr>
+                <th>Probabilidade \ Severidade</th>
+                <th>1 · Trivial</th>
+                <th>2 · Leve</th>
+                <th>3 · Moderado</th>
+                <th>4 · Significativo</th>
+                <th>5 · Extremo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5 · Sempre</td>
+                <td class="rc-pr2">PR2<br>RISCO ALTO</td>
+                <td class="rc-pr2">PR2<br>RISCO ALTO</td>
+                <td class="rc-pr2">PR2<br>RISCO ALTO</td>
+                <td class="rc-pr1">PR1<br>RISCO CRÍTICO</td>
+                <td class="rc-pr1">PR1<br>RISCO CRÍTICO</td>
+              </tr>
+              <tr>
+                <td>4 · Frequentemente</td>
+                <td class="rc-pr3">PR3<br>RISCO MÉDIO</td>
+                <td class="rc-pr3">PR3<br>RISCO MÉDIO</td>
+                <td class="rc-pr2">PR2<br>RISCO ALTO</td>
+                <td class="rc-pr2">PR2<br>RISCO ALTO</td>
+                <td class="rc-pr1">PR1<br>RISCO CRÍTICO</td>
+              </tr>
+              <tr>
+                <td>3 · Às vezes</td>
+                <td class="rc-pr4">PR4<br>RISCO BAIXO</td>
+                <td class="rc-pr3">PR3<br>RISCO MÉDIO</td>
+                <td class="rc-pr3">PR3<br>RISCO MÉDIO</td>
+                <td class="rc-pr3">PR3<br>RISCO MÉDIO</td>
+                <td class="rc-pr2">PR2<br>RISCO ALTO</td>
+              </tr>
+              <tr>
+                <td>2 · Raramente</td>
+                <td class="rc-pr4">PR4<br>RISCO BAIXO</td>
+                <td class="rc-pr4">PR4<br>RISCO BAIXO</td>
+                <td class="rc-pr4">PR4<br>RISCO BAIXO</td>
+                <td class="rc-pr3">PR3<br>RISCO MÉDIO</td>
+                <td class="rc-pr3">PR3<br>RISCO MÉDIO</td>
+              </tr>
+              <tr>
+                <td>1 · Nunca</td>
+                <td class="rc-irr">IRR<br>IRRELEVANTE</td>
+                <td class="rc-pr4">PR4<br>RISCO BAIXO</td>
+                <td class="rc-pr4">PR4<br>RISCO BAIXO</td>
+                <td class="rc-pr4">PR4<br>RISCO BAIXO</td>
+                <td class="rc-pr4">PR4<br>RISCO BAIXO</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mural-block">
+          <h3>Medidas de Prevenção por Classificação</h3>
+          <table class="risk-matrix">
+            <thead>
+              <tr><th>Código</th><th>Condição</th><th>Nível</th><th>Medida indicada</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="rc-pr1">PR1</td><td class="rc-pr1">RISCO CRÍTICO</td><td>5</td><td style="text-align:left">Avaliação psicológica imediata; monitoramento contínuo; AET urgente.</td></tr>
+              <tr><td class="rc-pr2">PR2</td><td class="rc-pr2">RISCO ALTO</td><td>4 e 5</td><td style="text-align:left">Medidas de redução a curto prazo; avaliações psicossociais e ergonômicas.</td></tr>
+              <tr><td class="rc-pr3">PR3</td><td class="rc-pr3">RISCO MÉDIO</td><td>3, 4 e 5</td><td style="text-align:left">Liderança e comunicação; bem-estar; treinamentos específicos.</td></tr>
+              <tr><td class="rc-pr4">PR4</td><td class="rc-pr4">RISCO BAIXO</td><td>1, 2 e 3</td><td style="text-align:left">Monitorar; registrar para comunicação; analisar viabilidade de melhorias.</td></tr>
+              <tr><td class="rc-irr">IRR</td><td class="rc-irr">IRRELEVANTE</td><td>1, 2, 3, 4 e 5</td><td style="text-align:left">Monitoramento contínuo; exames médicos (SRQ-20).</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mural-block">
+          <h3>Referências</h3>
+          <div class="fonte-box">
+            <strong>Instrumento de avaliação:</strong> EACT — Escala de Avaliação do Contexto de Trabalho; ECHT — Escala de Custo Humano do Trabalho. Adaptado da metodologia BRUMED para análise de riscos psicossociais conforme NR-01.<br><br>
+            <strong>Base normativa:</strong> Portaria MTE nº 1.419, de 27 de setembro de 2024 — Altera a Norma Regulamentadora nº 1 (NR-01), incluindo os fatores de risco psicossocial no escopo do PGR. Publicada no Diário Oficial da União.<br><br>
+            <strong>Referência bibliográfica:</strong> MIRANDA, William Freitas. <em>APR nas NR: Um estudo sobre a imposição de Análise Preliminar de Riscos pelas Normas Regulamentadoras do Ministério do Trabalho.</em> Jaboatão dos Guararapes: Edição do Autor, 2017.<br><br>
+            <strong>Sistema:</strong> BRUMED MASTER v1.0 — Portrex Operações e Soluções Integradas Ltda, 2026.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Action bar -->
+<div class="action-bar" id="actionBar">
+  <button class="btn btn-secondary" id="btnBack" onclick="prevStep()" style="display:none;">← Voltar</button>
+  <button class="btn btn-primary" id="btnNext" onclick="nextStep()">Próximo →</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  ESTADO
+// ═══════════════════════════════════════════════
+let currentStep = 1;
+let selectedFile = null;
+let sevGeral = 3;
+let sevPreview = 3;
+let previewData = null;
+let sevPorSetor = {};
+
+// ═══════════════════════════════════════════════
+//  NAVEGAÇÃO
+// ═══════════════════════════════════════════════
+function goStep(n) {
+  if (n > currentStep && n !== 5) return; // step 5 sempre acessível
+  currentStep = n;
+  renderStep();
+}
+
+function nextStep() {
+  if (!validateStep(currentStep)) return;
+  if (currentStep === 1) {
+    currentStep = 2;
+    renderStep();
+    loadSetoresBg();
+    return;
+  }
+  if (currentStep === 2) {
+    currentStep = 3;
+    renderStep();
+    loadPreview();
+    return;
+  }
+  if (currentStep < 4) currentStep++;
+  renderStep();
+}
+
+function prevStep() {
+  if (currentStep > 1) currentStep--;
+  renderStep();
+}
+
+function renderStep() {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.step').forEach(s => { s.classList.remove('active','done'); });
+  document.getElementById(`sec${currentStep}`).classList.add('active');
+
+  for (let i = 1; i <= 5; i++) {
+    const s = document.getElementById(`step${i}`);
+    if (!s) continue;
+    if (i === 5) { s.classList.add('done'); }  // step 5 sempre acessível
+    else if (i < currentStep) s.classList.add('done');
+    else if (i === currentStep) s.classList.add('active');
+  }
+  if (currentStep === 5) {
+    document.getElementById('step5').classList.remove('done');
+    document.getElementById('step5').classList.add('active');
+  }
+
+  const pcts = {1:20, 2:40, 3:60, 4:80, 5:100};
+  document.getElementById('progressFill').style.width = (pcts[currentStep] || 20) + '%';
+
+  const btnBack = document.getElementById('btnBack');
+  const btnNext = document.getElementById('btnNext');
+  btnBack.style.display = currentStep > 1 ? 'inline-flex' : 'none';
+  btnNext.style.display = currentStep < 4 ? 'inline-flex' : 'none';
+
+  if (currentStep === 4) {
+    document.getElementById('gerarReady').style.display = 'block';
+    document.getElementById('loadingGerar').classList.remove('show');
+    document.getElementById('successBox').classList.remove('show');
+    document.getElementById('gerarError').style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  VALIDAÇÕES
+// ═══════════════════════════════════════════════
+function validateStep(step) {
+  if (step === 1) {
+    if (!selectedFile) { alert('Selecione a planilha antes de continuar.'); return false; }
+    return true;
+  }
+  if (step === 2) {
+    let ok = true;
+    const fields = [
+      ['f_razao','razao_social','Razão Social'],
+      ['f_cnpj','cnpj','CNPJ'],
+      ['f_prof','profissional_responsavel','Profissional'],
+      ['f_ocup','ocupacao','Ocupação'],
+      ['f_reg','registro_profissional','Registro'],
+      ['f_data','data_relatorio','Data'],
+    ];
+    fields.forEach(([fid, iid]) => {
+      const val = document.getElementById(iid).value.trim();
+      if (!val) {
+        document.getElementById(fid).classList.add('has-error');
+        ok = false;
+      }
+    });
+    return ok;
+  }
+  return true;
+}
+
+function clearErr(fid) {
+  document.getElementById(fid).classList.remove('has-error');
+}
+
+// ═══════════════════════════════════════════════
+//  ARQUIVO
+// ═══════════════════════════════════════════════
+const fileInput = document.getElementById('fileInput');
+const uploadZone = document.getElementById('uploadZone');
+const uploadOk = document.getElementById('uploadOk');
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) setFile(e.target.files[0]);
+});
+
+uploadZone.addEventListener('dragover', e => {
+  e.preventDefault(); uploadZone.classList.add('dragover');
+});
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault(); uploadZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+});
+
+function setFile(file) {
+  if (!file.name.endsWith('.xlsx')) {
+    alert('Formato inválido. Use um arquivo .xlsx'); return;
+  }
+  selectedFile = file;
+  const kb = (file.size/1024).toFixed(0);
+  uploadZone.style.display = 'none';
+  uploadOk.classList.add('show');
+  document.getElementById('uploadOkName').textContent = file.name;
+  document.getElementById('uploadOkSub').textContent = `${kb} KB`;
+}
+
+function resetFile() {
+  selectedFile = null;
+  fileInput.value = '';
+  uploadZone.style.display = 'block';
+  uploadOk.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════
+//  SEVERIDADE
+// ═══════════════════════════════════════════════
+function setSev(val, groupId) {
+  document.querySelectorAll(`#${groupId} .sev-btn`).forEach((b,i) => {
+    b.classList.toggle('active', i+1 === val);
+  });
+  sevGeral = val;
+}
+
+// ═══════════════════════════════════════════════
+//  MÁSCARAS
+// ═══════════════════════════════════════════════
+function maskCNPJ(input) {
+  let v = input.value.replace(/\D/g,'').slice(0,14);
+  if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
+  else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d+)$/,'$1.$2.$3/$4');
+  else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d+)$/,'$1.$2.$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d+)$/,'$1.$2');
+  input.value = v;
+}
+
+function maskData(input) {
+  let v = input.value.replace(/\D/g,'').slice(0,8);
+  if (v.length > 4) v = v.replace(/^(\d{2})(\d{2})(\d+)$/,'$1/$2/$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d+)$/,'$1/$2');
+  input.value = v;
+}
+
+// ═══════════════════════════════════════════════
+//  OPÇÕES DE RELATÓRIO
+// ═══════════════════════════════════════════════
+function toggleOpt(id) {
+  const el = document.getElementById(id);
+  const cb = el.querySelector('input');
+  el.classList.toggle('checked', cb.checked);
+}
+
+// ═══════════════════════════════════════════════
+//  PREVIEW
+// ═══════════════════════════════════════════════
+async function loadPreview() {
+  document.getElementById('loadingPreview').classList.add('show');
+  document.getElementById('previewContent').style.display = 'none';
+  document.getElementById('previewError').style.display = 'none';
+
+  try {
+    const fd = new FormData();
+    fd.append('arquivo', selectedFile);
+    fd.append('severidade_geral', sevGeral);
+
+    const res = await fetch('/api/preview', { method:'POST', body: fd });
+    const data = await res.json();
+
+    if (!data.ok) throw new Error(data.error);
+
+    previewData = data.data;
+    renderPreview(data.data);
+  } catch(e) {
+    document.getElementById('loadingPreview').classList.remove('show');
+    document.getElementById('previewError').style.display = 'block';
+    document.getElementById('previewError').textContent = '❌ ' + e.message;
+  }
+}
+
+async function loadSetoresBg() {
+  const loading = document.getElementById('sevSetoresLoading');
+  const lista   = document.getElementById('sevSetoresLista');
+  loading.style.display = 'flex';
+  lista.style.display   = 'none';
+  lista.innerHTML       = '';
+
+  try {
+    const fd = new FormData();
+    fd.append('arquivo', selectedFile);
+    fd.append('severidade_geral', sevGeral);
+    const res  = await fetch('/api/preview', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+
+    const setores = data.data.setores;
+    setores.forEach(s => { if (!sevPorSetor[s.nome]) sevPorSetor[s.nome] = sevGeral; });
+
+    const SEV_LABELS = {1:'Trivial',2:'Leve',3:'Moderado',4:'Significativo',5:'Extremo'};
+    lista.innerHTML = setores.map(s => {
+      const key = s.nome.replace(/[^a-zA-Z0-9]/g, '_');
+      const btns = [1,2,3,4,5].map(v => `
+        <div class="sev-setor-btn${v === sevPorSetor[s.nome] ? ' active' : ''}"
+             title="${v} · ${SEV_LABELS[v]}"
+             onclick="setSevSetorP2('${s.nome.replace(/'/g,"\\'")}',${v},'p2_${key}')">${v}</div>
+      `).join('');
+      return `<div class="sev-setor-row">
+        <span class="sev-setor-nome">🏭 ${s.nome}</span>
+        <div class="sev-setor-btns" id="p2_${key}">${btns}</div>
+      </div>`;
+    }).join('');
+
+    loading.style.display = 'none';
+    lista.style.display   = 'flex';
+  } catch(e) {
+    loading.innerHTML = `<span style="color:#ef4444">Erro ao ler setores: ${e.message}</span>`;
+  }
+}
+
+function setSevSetorP2(nomeSetor, val, groupId) {
+  sevPorSetor[nomeSetor] = val;
+  document.querySelectorAll(`#${groupId} .sev-setor-btn`).forEach((b, i) => {
+    b.classList.toggle('active', i + 1 === val);
+  });
+  // sincroniza com seletores do Preview (step 3) se já renderizados
+  const key = nomeSetor.replace(/[^a-zA-Z0-9]/g, '_');
+  document.querySelectorAll(`#sev_${key} .setor-sev-btn`).forEach((b, i) => {
+    b.classList.toggle('active', i + 1 === val);
+  });
+}
+
+function setSevSetor(nomeSetor, val) {
+  sevPorSetor[nomeSetor] = val;
+  const key = nomeSetor.replace(/[^a-zA-Z0-9]/g, '_');
+  document.querySelectorAll(`#sev_${key} .setor-sev-btn`).forEach((b, i) => {
+    b.classList.toggle('active', i + 1 === val);
+  });
+}
+
+function renderPreview(data) {
+  document.getElementById('loadingPreview').classList.remove('show');
+  document.getElementById('previewContent').style.display = 'block';
+
+  // Inicializar sevPorSetor com sevGeral para cada setor
+  data.setores.forEach(s => {
+    if (!sevPorSetor[s.nome]) sevPorSetor[s.nome] = sevGeral;
+  });
+
+  // Stats
+  document.getElementById('previewStats').innerHTML = `
+    <div class="preview-stat">
+      <div class="preview-stat-val">${data.total_respondentes}</div>
+      <div class="preview-stat-lbl">Respondentes válidos</div>
+    </div>
+    <div class="preview-stat">
+      <div class="preview-stat-val">${data.setores.length}</div>
+      <div class="preview-stat-lbl">Setores identificados</div>
+    </div>
+    <div class="preview-stat">
+      <div class="preview-stat-val">5</div>
+      <div class="preview-stat-lbl">Questionários processados</div>
+    </div>
+  `;
+
+  // Setores
+  const COLORS = {'RISCO CRÍTICO':'#ef4444','RISCO ALTO':'#f97316',
+                  'RISCO MÉDIO':'#eab308','RISCO BAIXO':'#22c55e','IRRELEVANTE':'#6b7280'};
+  const SEV_LABELS = {1:'Trivial',2:'Leve',3:'Moderado',4:'Significativo',5:'Extremo'};
+
+  document.getElementById('previewSetores').innerHTML = data.setores.map(s => {
+    const key = s.nome.replace(/[^a-zA-Z0-9]/g, '_');
+    const sevAtual = sevPorSetor[s.nome] || sevGeral;
+    const btns = [1,2,3,4,5].map(v => `
+      <div class="setor-sev-btn${v === sevAtual ? ' active' : ''}"
+           onclick="setSevSetor('${s.nome.replace(/'/g,"\\'")}', ${v})"
+           title="${v} · ${SEV_LABELS[v]}">${v}</div>
+    `).join('');
+    return `
+    <div class="setor-card">
+      <div class="setor-name">🏭 ${s.nome}</div>
+      <div class="setor-respondentes">${s.respondentes} respondente(s)</div>
+      <div class="setor-grid">
+        <div class="q-box">
+          <div class="q-label">Q1 · Contexto</div>
+          <div class="q-media">${s.q1.media}</div>
+          <div class="q-cond" style="color:${s.q1.cor}">${s.q1.codigo} · ${s.q1.condicao}</div>
+        </div>
+        <div class="q-box">
+          <div class="q-label">Q2 · Exigências</div>
+          <div class="q-media">${s.q2.media}</div>
+          <div class="q-cond" style="color:${s.q2.cor}">${s.q2.codigo} · ${s.q2.condicao}</div>
+        </div>
+        <div class="q-box">
+          <div class="q-label">Q3 · Sintomas</div>
+          <div class="q-media">${s.q3.media}</div>
+          <div class="q-cond" style="color:var(--text-dim)">Média geral</div>
+        </div>
+        <div class="q-box">
+          <div class="q-label">Q4 · Vivências+</div>
+          <div class="q-media">${s.q4.media}</div>
+          <div class="q-cond" style="color:var(--text-dim)">Escala invertida</div>
+        </div>
+        <div class="q-box">
+          <div class="q-label">Q5 · Vivências−</div>
+          <div class="q-media">${s.q5.media}</div>
+          <div class="q-cond" style="color:var(--text-dim)">Média geral</div>
+        </div>
+      </div>
+      <div class="setor-sev">
+        <span class="setor-sev-label">Severidade para o relatório:</span>
+        <div class="setor-sev-btns" id="sev_${key}">${btns}</div>
+        <span class="setor-sev-hint">Trivial → Extremo</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  GERAÇÃO
+// ═══════════════════════════════════════════════
+async function gerarRelatorios() {
+  document.getElementById('gerarReady').style.display = 'none';
+  document.getElementById('loadingGerar').classList.add('show');
+  document.getElementById('gerarError').style.display = 'none';
+
+  const msgs = [
+    'Lendo planilha...', 'Validando dados...', 'Calculando médias...',
+    'Classificando riscos...', 'Gerando documentos...'
+  ];
+  let mi = 0;
+  const interval = setInterval(() => {
+    document.getElementById('loadingGerarMsg').textContent = msgs[mi++ % msgs.length];
+  }, 900);
+
+  try {
+    const fd = new FormData();
+    fd.append('arquivo', selectedFile);
+    fd.append('razao_social', document.getElementById('razao_social').value);
+    fd.append('cnpj', document.getElementById('cnpj').value);
+    fd.append('profissional_responsavel', document.getElementById('profissional_responsavel').value);
+    fd.append('ocupacao', document.getElementById('ocupacao').value);
+    fd.append('registro_profissional', document.getElementById('registro_profissional').value);
+    const rawDate = document.getElementById('data_relatorio').value;
+    const fmtDate = rawDate ? rawDate.split('-').reverse().join('/') : '';
+    fd.append('data_relatorio', fmtDate);
+    fd.append('severidade_geral', sevGeral);
+    fd.append('severidades_por_setor', JSON.stringify(sevPorSetor));
+    fd.append('gerar_top5', document.querySelector('#opt_top5 input').checked);
+    fd.append('gerar_consistencia', document.querySelector('#opt_cons input').checked);
+
+    const res = await fetch('/api/gerar', { method: 'POST', body: fd });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Erro desconhecido');
+    }
+
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+
+    clearInterval(interval);
+    document.getElementById('loadingGerar').classList.remove('show');
+    document.getElementById('successBox').classList.add('show');
+    document.getElementById('downloadLink').href = url;
+    document.getElementById('downloadLink').download = `BRUMED_${document.getElementById('razao_social').value}.zip`;
+    document.getElementById('downloadLink').click();
+
+  } catch(e) {
+    clearInterval(interval);
+    document.getElementById('loadingGerar').classList.remove('show');
+    document.getElementById('gerarReady').style.display = 'block';
+    document.getElementById('gerarError').style.display = 'block';
+    document.getElementById('gerarError').textContent = '❌ ' + e.message;
+  }
+}
+
+function novoRelatorio() {
+  currentStep = 1;
+  selectedFile = null;
+  fileInput.value = '';
+  uploadZone.style.display = 'block';
+  uploadOk.classList.remove('show');
+  renderStep();
+}
+
+// Init
+renderStep();
+
+// Restaurar sessão
+const saved = localStorage.getItem('brumed_prof');
+if (saved) {
+  try {
+    const d = JSON.parse(saved);
+    if (d.prof) document.getElementById('profissional_responsavel').value = d.prof;
+    if (d.ocup) document.getElementById('ocupacao').value = d.ocup;
+    if (d.reg)  document.getElementById('registro_profissional').value = d.reg;
+  } catch(e) {}
+}
+
+// Salvar profissional ao sair
+window.addEventListener('beforeunload', () => {
+  const d = {
+    prof: document.getElementById('profissional_responsavel').value,
+    ocup: document.getElementById('ocupacao').value,
+    reg:  document.getElementById('registro_profissional').value,
+  };
+  localStorage.setItem('brumed_prof', JSON.stringify(d));
+});
+</script>
+</body>
+</html>
