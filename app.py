@@ -54,7 +54,12 @@ Q_LABELS = {
     "Q5": "Vivências Negativas",
 }
 
-TEMPLATE_PATH = Path(__file__).parent / "resources" / "TEMPLATE OFICIAL.docx"
+_base = Path(__file__).parent
+TEMPLATE_PATH = (
+    _base / "resources" / "TEMPLATE OFICIAL.docx"
+    if (_base / "resources" / "TEMPLATE OFICIAL.docx").exists()
+    else _base / "TEMPLATE OFICIAL.docx"
+)
 TEMP_DIR      = Path(tempfile.gettempdir()) / "brumed_saas"
 TEMP_DIR.mkdir(exist_ok=True)
 
